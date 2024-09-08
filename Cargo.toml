@@ -1,0 +1,11 @@
+[package]
+name = "ttyheater"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+color-eyre = "0.6.3"
+ratatui = "0.28.1"
+rust-embed = { version = "8.5.0", features = ["compression"] }
+tui-term = "0.1.13"
+vt100 = "0.15.2"
