@@ -1,53 +1,44 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader, Cursor},
+use crate::{
+    animation::{Animation, Animations},
+    event::{handle_key_events, Event, EventHandler},
 };
-
 use color_eyre::Result;
 use ratatui::{
-    crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind, KeyModifiers},
-    layout::{Constraint, Direction, Layout, Margin},
-    style::{Color, Style, Stylize},
+    layout::{Constraint, Direction, Layout, Margin, Rect},
+    style::{Color, Style},
     text::Line,
-    widgets::{Block, List, ListState, Paragraph, Scrollbar, ScrollbarOrientation, ScrollbarState},
+    widgets::{Block, List, ListState, Scrollbar, ScrollbarOrientation, ScrollbarState},
     DefaultTerminal, Frame,
 };
-use rust_embed::Embed;
-use tui_term::widget::PseudoTerminal;
-use vt100::Parser;
-
-#[derive(Embed)]
-#[folder = "vt100"]
-struct Animation;
 
 pub struct App {
     /// Is the application running?
-    is_running: bool,
+    pub is_running: bool,
     // Is the animation being rendered?
-    is_rendering: bool,
-    /// Animations.
-    animations: Vec<String>,
+    pub is_rendering: bool,
+    /// Event handler.
+    pub event_handler: EventHandler,
     /// List state.
-    list_state: ListState,
-    // Reader for the file.
-    reader: Option<BufReader<Cursor<Vec<u8>>>>,
-    /// VT100 parser.
-    parser: Option<Parser>,
-    /// Buffer.
-    buffer: String,
+    pub list_state: ListState,
+    /// Animations.
+    pub animations: Vec<String>,
+    /// Animation widget.
+    pub animation: Animation,
+    /// Animation area.
+    pub animation_area: Rect,
 }
 
 impl App {
     /// Construct a new instance of [`App`].
-    pub fn new() -> Self {
+    pub fn new(event_handler: EventHandler) -> Self {
         Self {
             is_running: false,
             is_rendering: false,
-            animations: Animation::iter().map(|a| a.to_string()).collect(),
+            event_handler,
             list_state: ListState::default(),
-            reader: None,
-            parser: None,
-            buffer: String::new(),
+            animations: Animations::iter().map(|a| a.to_string()).collect(),
+            animation: Animation::default(),
+            animation_area: Rect::default(),
         }
     }
 
@@ -56,10 +47,12 @@ impl App {
         self.is_running = true;
         while self.is_running {
             terminal.draw(|frame| self.draw(frame))?;
-            if self.is_rendering {
-                std::thread::sleep(std::time::Duration::from_millis(10));
-            } else {
-                self.handle_crossterm_events()?;
+            let event = self.event_handler.next()?;
+            match event {
+                Event::Tick => {}
+                Event::Key(key_event) => handle_key_events(key_event, &mut self)?,
+                Event::Mouse(_) => {}
+                Event::Resize(_, _) => {}
             }
         }
         Ok(())
@@ -77,7 +70,7 @@ impl App {
                 self.animations
                     .clone()
                     .into_iter()
-                    .map(|v| Line::from(v))
+                    .map(Line::from)
                     .collect::<Vec<Line>>(),
             )
             .block(Block::bordered().title("Animations"))
@@ -99,77 +92,10 @@ impl App {
             }),
             &mut scrollbar_state,
         );
-
-        if !self.is_rendering {
-            frame.render_widget(Block::bordered(), area[1]);
-        } else {
-            match &mut self.parser {
-                Some(parser) => {
-                    let mut line_buffer = String::new();
-                    let bytes_read = self
-                        .reader
-                        .as_mut()
-                        .unwrap()
-                        .read_line(&mut line_buffer)
-                        .unwrap();
-                    if bytes_read > 0 {
-                        self.buffer += &line_buffer;
-                        parser.process(self.buffer.as_bytes());
-                        let pseudo_term = PseudoTerminal::new(parser.screen());
-                        frame.render_widget(pseudo_term.block(Block::bordered()), area[1]);
-                    } else {
-                        self.is_rendering = false;
-                        self.buffer.clear();
-                        self.parser = None;
-                    }
-                }
-                None => {
-                    self.parser = Some(Parser::new(area[1].height, area[1].width, 0));
-                }
-            }
+        self.animation_area = area[1];
+        if !self.animation.is_rendered {
+            frame.render_widget(&mut self.animation, self.animation_area);
+            self.event_handler.sender.send(Event::Tick).unwrap();
         }
-    }
-
-    /// Reads the crossterm events and updates the state of [`App`].
-    ///
-    /// If your application needs to perform work in between handling events, you can use the
-    /// [`event::poll`] function to check if there are any events available with a timeout.
-    fn handle_crossterm_events(&mut self) -> Result<()> {
-        match event::read()? {
-            Event::Key(key) if key.kind == KeyEventKind::Press => self.on_key_event(key)?,
-            Event::Mouse(_) => {}
-            Event::Resize(_, _) => {}
-            _ => {}
-        }
-        Ok(())
-    }
-
-    /// Handles the key events and updates the state of [`App`].
-    fn on_key_event(&mut self, key: KeyEvent) -> Result<()> {
-        match (key.modifiers, key.code) {
-            (_, KeyCode::Esc | KeyCode::Char('q'))
-            | (KeyModifiers::CONTROL, KeyCode::Char('c') | KeyCode::Char('C')) => {
-                self.is_running = false;
-            }
-            (_, KeyCode::Down | KeyCode::Char('j') | KeyCode::Char('J')) => {
-                self.list_state.select_next();
-            }
-            (_, KeyCode::Up | KeyCode::Char('k') | KeyCode::Char('K')) => {
-                self.list_state.select_previous();
-            }
-            (_, KeyCode::Enter) => {
-                if !self.is_rendering {
-                    let selected = self.list_state.selected().unwrap_or_default();
-                    let data = Animation::get(&self.animations[selected].clone())
-                        .unwrap()
-                        .data
-                        .into_owned();
-                    self.reader = Some(BufReader::new(Cursor::new(data)));
-                    self.is_rendering = true;
-                }
-            }
-            _ => {}
-        }
-        Ok(())
     }
 }
