@@ -38,13 +38,11 @@ impl Widget for &mut Animation {
     {
         let mut line_buffer = String::new();
         let bytes_read = self.reader.read_line(&mut line_buffer).unwrap();
-        if bytes_read > 0 {
-            self.buffer += &line_buffer;
-            self.parser.process(self.buffer.as_bytes());
-            let pseudo_term = PseudoTerminal::new(self.parser.screen());
-            pseudo_term.render(area, buf);
-        } else {
-            self.buffer.clear();
+        self.buffer += &line_buffer;
+        self.parser.process(self.buffer.as_bytes());
+        let pseudo_term = PseudoTerminal::new(self.parser.screen());
+        pseudo_term.render(area, buf);
+        if bytes_read == 0 {
             self.is_rendered = true;
         }
     }

@@ -27,6 +27,8 @@ pub enum Event {
 #[allow(dead_code)]
 #[derive(Debug)]
 pub struct EventHandler {
+    /// Tick rate.
+    pub tick_rate: Duration,
     /// Event sender channel.
     pub sender: mpsc::Sender<Event>,
     /// Event receiver channel.
@@ -74,6 +76,7 @@ impl EventHandler {
             })
         };
         Self {
+            tick_rate,
             sender,
             receiver,
             handler,
@@ -116,6 +119,9 @@ pub fn handle_key_events(key: KeyEvent, app: &mut App) -> Result<()> {
                     buffer: String::new(),
                 };
             }
+        }
+        (_, KeyCode::Tab) => {
+            app.is_toggled = !app.is_toggled;
         }
         _ => {}
     }
