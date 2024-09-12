@@ -1,7 +1,7 @@
 use std::time::{Duration, Instant};
 
 use crate::{
-    animation::{Animation, Animations},
+    animation::{descriptions, Animation, Animations},
     event::{handle_key_events, Event, EventHandler},
     fps::Fps,
 };
@@ -109,7 +109,7 @@ impl App {
                     .map(Line::from)
                     .collect::<Vec<Line>>(),
             )
-            .block(Block::bordered().title("Animations"))
+            .block(Block::bordered().title("List"))
             .highlight_style(Style::default().fg(Color::Yellow))
             .highlight_symbol(">"),
             area[0],
@@ -140,7 +140,21 @@ impl App {
                 .title(
                     Title::from(format!("fps: {}", self.fps.to_string()))
                         .alignment(Alignment::Right)
-                        .position(Position::Bottom),
+                        .position(Position::Top),
+                )
+                .title(
+                    Title::from(
+                        self.list_state
+                            .selected()
+                            .and_then(|i| {
+                                descriptions()
+                                    .get(self.animations[i].as_str())
+                                    .map(|v| v.to_string())
+                            })
+                            .unwrap_or_default(),
+                    )
+                    .alignment(Alignment::Center)
+                    .position(Position::Bottom),
                 ),
             area[1],
         );
