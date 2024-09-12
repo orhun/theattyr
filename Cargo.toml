@@ -1,11 +1,48 @@
 [package]
 name = "theattyr"
 version = "0.1.0"
+description = "A terminal theatre for playing VT100 art and animations"
+authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+homepage = "https://github.com/orhun/theattyr"
+repository = "https://github.com/orhun/theattyr"
+keywords = ["terminal", "vt100", "animation", "rendering"]
+categories = ["command-line-utilities"]
 edition = "2021"
+include = [
+  "src/**/*",
+  "vt100",
+  "Cargo.*",
+  "LICENSE*",
+  "README.md",
+  "CHANGELOG.md",
+]
 
 [dependencies]
-color-eyre = "0.6.3"
 ratatui = "0.28.1"
-rust-embed = { version = "8.5.0", features = ["compression", "debug-embed"] }
 tui-term = "0.1.13"
 vt100 = "0.15.2"
+rust-embed = { version = "8.5.0", features = ["compression", "debug-embed"] }
+color-eyre = "0.6.3"
+
+[profile.dev]
+opt-level = 0
+debug = true
+panic = "abort"
+
+[profile.test]
+opt-level = 0
+debug = true
+
+[profile.release]
+opt-level = 3
+debug = false
+panic = "unwind"
+lto = true
+codegen-units = 1
+strip = true
+
+[profile.bench]
+opt-level = 3
+debug = false
