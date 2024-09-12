@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.2 - 2024-09-12
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Allow dirty CI builds
+
 ## 0.1.1 - 2024-09-12
 
 ### 🐛 Bug Fixes
