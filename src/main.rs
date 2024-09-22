@@ -1,13 +1,11 @@
-pub mod animation;
-pub mod app;
-pub mod event;
-pub mod fps;
+use theattyr::*;
 
 fn main() -> color_eyre::Result<()> {
+    let args = Args::parse();
     color_eyre::install()?;
     let terminal = ratatui::init();
-    let event_handler = event::EventHandler::new(100);
-    let result = app::App::new(event_handler).run(terminal);
+    let event_handler = event::EventHandler::new(args.tick_rate);
+    let result = app::App::new(event_handler, args.fps).run(terminal);
     ratatui::restore();
     result
 }

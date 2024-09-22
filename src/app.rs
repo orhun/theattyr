@@ -32,13 +32,15 @@ pub struct App {
     pub animation: Animation,
     /// Animation area.
     pub animation_area: Rect,
-    /// FPS counter.
+    /// Frame interval for stable FPS.
+    pub frame_interval: Duration,
+    /// FPS counter widget.
     pub fps: Fps,
 }
 
 impl App {
     /// Construct a new instance of [`App`].
-    pub fn new(event_handler: EventHandler) -> Self {
+    pub fn new(event_handler: EventHandler, fps: f32) -> Self {
         Self {
             is_running: true,
             is_toggled: true,
@@ -47,14 +49,13 @@ impl App {
             animations: Animations::iter().map(|a| a.to_string()).collect(),
             animation: Animation::default(),
             animation_area: Rect::default(),
+            frame_interval: Duration::from_secs_f32(1.0 / fps),
             fps: Fps::default(),
         }
     }
 
     /// Run the application's main loop.
     pub fn run(mut self, mut terminal: DefaultTerminal) -> Result<()> {
-        let target_fps: f32 = 60.0;
-        let frame_interval: Duration = Duration::from_secs_f32(1.0 / target_fps);
         let mut accumulator = Duration::new(0, 0);
         let mut last_tick = Instant::now();
         let list_width = self
@@ -70,11 +71,11 @@ impl App {
                 Event::Tick => {
                     self.fps.tick();
                     accumulator += last_tick.elapsed();
-                    while accumulator >= frame_interval {
+                    while accumulator >= self.frame_interval {
                         if !self.animation.is_rendered {
                             self.event_handler.sender.send(Event::Tick)?;
                         }
-                        accumulator -= frame_interval;
+                        accumulator -= self.frame_interval;
                     }
                     last_tick = Instant::now();
                 }
