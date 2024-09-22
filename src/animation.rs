@@ -27,7 +27,7 @@ pub struct Animation {
 impl Default for Animation {
     fn default() -> Self {
         Self {
-            is_rendered: false,
+            is_rendered: true,
             reader: BufReader::new(Cursor::new(Vec::new())),
             parser: Parser::default(),
             buffer: String::new(),

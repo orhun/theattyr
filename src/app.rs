@@ -8,7 +8,7 @@ use crate::{
 use color_eyre::Result;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     text::Line,
     widgets::{
         block::{Position, Title},
@@ -20,8 +20,6 @@ use ratatui::{
 pub struct App {
     /// Is the application running?
     pub is_running: bool,
-    // Is the animation being rendered?
-    pub is_rendering: bool,
     /// Is the UI toggled?
     pub is_toggled: bool,
     /// Event handler.
@@ -43,7 +41,6 @@ impl App {
     pub fn new(event_handler: EventHandler) -> Self {
         Self {
             is_running: true,
-            is_rendering: false,
             is_toggled: true,
             event_handler,
             list_state: ListState::default().with_selected(Some(0)),
@@ -74,7 +71,9 @@ impl App {
                     self.fps.tick();
                     accumulator += last_tick.elapsed();
                     while accumulator >= frame_interval {
-                        self.event_handler.sender.send(Event::Tick)?;
+                        if !self.animation.is_rendered {
+                            self.event_handler.sender.send(Event::Tick)?;
+                        }
                         accumulator -= frame_interval;
                     }
                     last_tick = Instant::now();
@@ -109,7 +108,7 @@ impl App {
                     .map(Line::from)
                     .collect::<Vec<Line>>(),
             )
-            .block(Block::bordered().title("List"))
+            .block(Block::bordered().title("|VT100 Animations|"))
             .highlight_style(Style::default().fg(Color::Yellow))
             .highlight_symbol(">"),
             area[0],
@@ -130,34 +129,49 @@ impl App {
                 &mut scrollbar_state,
             );
         }
-        frame.render_widget(
-            Block::bordered()
-                .title(
-                    Title::from("Animation")
-                        .alignment(Alignment::Center)
-                        .position(Position::Top),
-                )
-                .title(
-                    Title::from(format!("fps: {}", self.fps.to_string()))
-                        .alignment(Alignment::Right)
-                        .position(Position::Top),
-                )
-                .title(
-                    Title::from(
-                        self.list_state
-                            .selected()
-                            .and_then(|i| {
-                                descriptions()
-                                    .get(self.animations[i].as_str())
-                                    .map(|v| v.to_string())
-                            })
-                            .unwrap_or_default(),
-                    )
-                    .alignment(Alignment::Center)
-                    .position(Position::Bottom),
-                ),
-            area[1],
-        );
+        let mut block = Block::bordered()
+            .title(Title::from(
+                env!("CARGO_PKG_NAME").bold().into_centered_line(),
+            ))
+            .title(
+                Title::from(Line::from(vec![
+                    "|".into(),
+                    self.list_state
+                        .selected()
+                        .map(|i| self.animations[i].clone())
+                        .unwrap_or_default()
+                        .bold(),
+                    ": ".into(),
+                    self.list_state
+                        .selected()
+                        .and_then(|i| {
+                            descriptions()
+                                .get(self.animations[i].as_str())
+                                .map(|v| v.to_string())
+                        })
+                        .unwrap_or_default()
+                        .italic(),
+                    "|".into(),
+                ]))
+                .alignment(Alignment::Left)
+                .position(Position::Bottom),
+            );
+
+        if !self.animation.is_rendered {
+            block = block.title(
+                Title::from(Line::from(vec![
+                    "|".into(),
+                    "fps".italic(),
+                    ": ".into(),
+                    self.fps.to_string().into(),
+                    "|".into(),
+                ]))
+                .alignment(Alignment::Right)
+                .position(Position::Top),
+            );
+        }
+
+        frame.render_widget(block, area[1]);
         self.animation_area = area[1].inner(Margin {
             vertical: 1,
             horizontal: 1,

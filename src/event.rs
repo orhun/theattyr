@@ -106,19 +106,17 @@ pub fn handle_key_events(key: KeyEvent, app: &mut App) -> Result<()> {
             app.list_state.select_previous();
         }
         (_, KeyCode::Enter) => {
-            if !app.is_rendering {
-                let selected = app.list_state.selected().unwrap_or_default();
-                let data = Animations::get(&app.animations[selected].clone())
-                    .unwrap()
-                    .data
-                    .into_owned();
-                app.animation = Animation {
-                    is_rendered: false,
-                    reader: BufReader::new(Cursor::new(data)),
-                    parser: Parser::new(app.animation_area.height, app.animation_area.width, 0),
-                    buffer: String::new(),
-                };
-            }
+            let selected = app.list_state.selected().unwrap_or_default();
+            let data = Animations::get(&app.animations[selected].clone())
+                .unwrap()
+                .data
+                .into_owned();
+            app.animation = Animation {
+                is_rendered: false,
+                reader: BufReader::new(Cursor::new(data)),
+                parser: Parser::new(app.animation_area.height, app.animation_area.width, 0),
+                buffer: String::new(),
+            };
         }
         (_, KeyCode::Tab) => {
             app.is_toggled = !app.is_toggled;
