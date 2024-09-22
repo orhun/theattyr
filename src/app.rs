@@ -80,6 +80,8 @@ impl App {
         {
             self.is_toggled = false;
             self.list_state.select(Some(position));
+        } else if self.args.file.is_some() {
+            color_eyre::eyre::bail!("unknown file, please select one of {:?}", self.animations)
         }
         while self.is_running {
             terminal.draw(|frame| self.draw(frame, list_width))?;
