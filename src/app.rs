@@ -115,7 +115,7 @@ impl App {
         let area = Layout::new(
             Direction::Horizontal,
             [
-                Constraint::Min((list_width as u16 + 4) * self.is_toggled as u16),
+                Constraint::Min((list_width as u16 + 5) * self.is_toggled as u16),
                 Constraint::Percentage(100),
             ],
         )
@@ -128,9 +128,23 @@ impl App {
                     .map(Line::from)
                     .collect::<Vec<Line>>(),
             )
-            .block(Block::bordered().title("|VT100 Animations|"))
-            .highlight_style(Style::default().fg(Color::Yellow))
-            .highlight_symbol(">"),
+            .block(
+                Block::bordered()
+                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                    .title(
+                        "VT100 Animations"
+                            .fg(Color::Reset)
+                            .bold()
+                            .underlined()
+                            .into_centered_line(),
+                    ),
+            )
+            .highlight_style(if self.animation.is_rendered {
+                Style::default().fg(Color::Magenta).slow_blink()
+            } else {
+                Style::default().fg(Color::Green)
+            })
+            .highlight_symbol("➤ "),
             area[0],
             &mut self.list_state,
         );
@@ -150,8 +164,12 @@ impl App {
             );
         }
         let mut block = Block::bordered()
+            .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
             .title(Title::from(
-                env!("CARGO_PKG_NAME").bold().into_centered_line(),
+                format!("{} 🎥", env!("CARGO_PKG_NAME"))
+                    .fg(Color::Reset)
+                    .bold()
+                    .into_centered_line(),
             ))
             .title(
                 Title::from(Line::from(vec![
@@ -160,6 +178,7 @@ impl App {
                         .selected()
                         .map(|i| self.animations[i].clone())
                         .unwrap_or_default()
+                        .fg(Color::Reset)
                         .bold(),
                     ": ".into(),
                     self.list_state
@@ -170,6 +189,7 @@ impl App {
                                 .map(|v| v.to_string())
                         })
                         .unwrap_or_default()
+                        .fg(Color::Reset)
                         .italic(),
                     "|".into(),
                 ]))
