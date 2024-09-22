@@ -17,6 +17,10 @@ pub use clap::Parser;
 ",
 )]
 pub struct Args {
+    /// Play a specific file.
+    #[arg(env, long)]
+    pub file: Option<String>,
+
     /// Terminal tick rate.
     #[arg(env, short, long, value_name = "MS", default_value = "100")]
     pub tick_rate: u64,

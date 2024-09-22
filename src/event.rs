@@ -1,14 +1,11 @@
-use crate::animation::{Animation, Animations};
 use crate::app::App;
 use color_eyre::Result;
 use ratatui::crossterm::event::{
     self, Event as CrosstermEvent, KeyCode, KeyEvent, KeyEventKind, KeyModifiers, MouseEvent,
 };
-use std::io::{BufReader, Cursor};
 use std::sync::mpsc;
 use std::thread;
 use std::time::{Duration, Instant};
-use vt100::Parser;
 
 /// Terminal events.
 #[derive(Clone, Debug, PartialEq)]
@@ -106,17 +103,7 @@ pub fn handle_key_events(key: KeyEvent, app: &mut App) -> Result<()> {
             app.list_state.select_previous();
         }
         (_, KeyCode::Enter) => {
-            let selected = app.list_state.selected().unwrap_or_default();
-            let data = Animations::get(&app.animations[selected].clone())
-                .unwrap()
-                .data
-                .into_owned();
-            app.animation = Animation {
-                is_rendered: false,
-                reader: BufReader::new(Cursor::new(data)),
-                parser: Parser::new(app.animation_area.height, app.animation_area.width, 0),
-                buffer: String::new(),
-            };
+            app.start_animation();
         }
         (_, KeyCode::Tab) => {
             app.is_toggled = !app.is_toggled;

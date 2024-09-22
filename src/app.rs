@@ -1,9 +1,14 @@
-use std::time::{Duration, Instant};
+use std::{
+    io::{BufReader, Cursor},
+    time::{Duration, Instant},
+};
+use vt100::Parser;
 
 use crate::{
     animation::{descriptions, Animation, Animations},
     event::{handle_key_events, Event, EventHandler},
     fps::Fps,
+    Args,
 };
 use color_eyre::Result;
 use ratatui::{
@@ -18,6 +23,8 @@ use ratatui::{
 };
 
 pub struct App {
+    /// Arguments.
+    pub args: Args,
     /// Is the application running?
     pub is_running: bool,
     /// Is the UI toggled?
@@ -40,7 +47,7 @@ pub struct App {
 
 impl App {
     /// Construct a new instance of [`App`].
-    pub fn new(event_handler: EventHandler, fps: f32) -> Self {
+    pub fn new(event_handler: EventHandler, args: Args) -> Self {
         Self {
             is_running: true,
             is_toggled: true,
@@ -49,8 +56,9 @@ impl App {
             animations: Animations::iter().map(|a| a.to_string()).collect(),
             animation: Animation::default(),
             animation_area: Rect::default(),
-            frame_interval: Duration::from_secs_f32(1.0 / fps),
+            frame_interval: Duration::from_secs_f32(1.0 / args.fps),
             fps: Fps::default(),
+            args,
         }
     }
 
@@ -64,6 +72,15 @@ impl App {
             .map(|a| a.len())
             .max()
             .unwrap_or_default();
+        if let Some(position) = self
+            .args
+            .file
+            .as_ref()
+            .and_then(|file| self.animations.iter().position(|anim| file == anim))
+        {
+            self.is_toggled = false;
+            self.list_state.select(Some(position));
+        }
         while self.is_running {
             terminal.draw(|frame| self.draw(frame, list_width))?;
             let event = self.event_handler.next()?;
@@ -178,5 +195,19 @@ impl App {
             horizontal: 1,
         });
         frame.render_widget(&mut self.animation, self.animation_area);
+    }
+
+    pub fn start_animation(&mut self) {
+        let selected = self.list_state.selected().unwrap_or_default();
+        let data = Animations::get(&self.animations[selected].clone())
+            .unwrap()
+            .data
+            .into_owned();
+        self.animation = Animation {
+            is_rendered: false,
+            reader: BufReader::new(Cursor::new(data)),
+            parser: Parser::new(self.animation_area.height, self.animation_area.width, 0),
+            buffer: String::new(),
+        };
     }
 }
