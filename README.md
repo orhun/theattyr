@@ -14,7 +14,7 @@ A terminal theater for playing [VT100 art and animations](http://artscene.textfi
 
 ### Installation
 
-#### Cargo
+#### Cargo 📦
 
 ```shell
 cargo install theattyr
