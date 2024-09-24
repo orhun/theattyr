@@ -1,4 +1,4 @@
-name: CD
+name: Release
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         id: git-cliff
         with:
-          args: --latest --github-repo ${{ github.repository }}
+          args: --latest --github-repo ${{ github.repository }} --strip all
         env:
           OUTPUT: CHANGES.md
 
