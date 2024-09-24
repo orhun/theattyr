@@ -6,40 +6,6 @@ on:
       - "v*.*.*"
 
 jobs:
-  publish-github:
-    name: Publish on GitHub
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set the release version
-        run: echo "RELEASE_VERSION=${GITHUB_REF:11}" >> $GITHUB_ENV
-
-      - name: Install Rust stable
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache Cargo dependencies
-        uses: Swatinem/rust-cache@v2
-
-      - name: Check
-        run: cargo check --locked
-
-      - name: Generate a changelog
-        uses: orhun/git-cliff-action@v4
-        id: git-cliff
-        with:
-          args: --latest --github-repo ${{ github.repository }} --strip all
-        env:
-          OUTPUT: CHANGES.md
-
-      - name: Create release
-        run: gh release create "${{ github.ref_name }}" -F CHANGES.md
-        env:
-          GH_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN }}
-
   publish-crates-io:
     name: Publish on crates.io
     needs: publish-github
