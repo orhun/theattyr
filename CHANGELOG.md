@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.6 - 2024-09-24
+
+### 🐛 Bug Fixes
+
+- *(release)* Remove unnecessary job dependency
+
+### 📚 Documentation
+
+- *(readme)* Update playlist link
+- *(readme)* Move installation section to top
+- *(readme)* Move installation section
+- *(readme)* Add demos and usage
+- *(readme)* Add emoji
+- *(readme)* Fix admonitions
+
 ## 0.1.5 - 2024-09-24
 
 ### 🐛 Bug Fixes
