@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.5 - 2024-09-24
+
+### 🐛 Bug Fixes
+
+- *(ci)* Remove publish-github step
+
+### 🚜 Refactor
+
+- *(ci)* Rename jobs and update changelog
+
 ## 0.1.4 - 2024-09-24
 
 ### 🚀 Features
