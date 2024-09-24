@@ -12,6 +12,14 @@ A terminal theater for playing [VT100 art and animations](http://artscene.textfi
 > [!TIP]  
 > I developed this tool over a series of livestreams, which you can check out [here](https://www.youtube.com/@orhundev/streams).
 
+### Installation
+
+#### Cargo 📦
+
+```shell
+cargo install theattyr
+```
+
 ### Usage
 
 Simply run `theattyr` and browse the terminal movies!
@@ -26,14 +34,6 @@ Or you can specify a file at the start via e.g. `theattyr fireworks.vt`:
 
 - Press <kbd>Tab</kbd> to hide the sidebar.
 - You can specify a FPS value via `--fps` argument. Run `theattyr --help` for other options.
-
-### Installation
-
-#### Cargo 📦
-
-```shell
-cargo install theattyr
-```
 
 ### List of Animations
 
