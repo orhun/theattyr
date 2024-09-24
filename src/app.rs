@@ -166,7 +166,8 @@ impl App {
         let mut block = Block::bordered()
             .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
             .title(Title::from(
-                "theaTTYr 🎥".to_string()
+                "theaTTYr 🎥"
+                    .to_string()
                     .fg(Color::Reset)
                     .bold()
                     .into_centered_line(),
