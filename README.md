@@ -27,6 +27,14 @@ Or you can specify a file at the start via e.g. `theattyr fireworks.vt`:
 - Press <kbd>Tab</kbd> to hide the sidebar.
 - You can specify a FPS value via `--fps` argument. Run `theattyr --help` for other options.
 
+### Installation
+
+#### Cargo 📦
+
+```shell
+cargo install theattyr
+```
+
 ### List of Animations
 
 See <http://artscene.textfiles.com/vt100/>
@@ -131,14 +139,6 @@ See <http://artscene.textfiles.com/vt100/>
 | zorro.vt          | The Story of Zorro by Cian O'Kiersey                             |
 
 </details>
-
-### Installation
-
-#### Cargo 📦
-
-```shell
-cargo install theattyr
-```
 
 ## License
 
