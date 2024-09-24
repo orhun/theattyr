@@ -10,7 +10,7 @@ A terminal theater for playing [VT100 art and animations](http://artscene.textfi
 > Usually, they represent a long hand-crafted process done by a single person to tell a story. Some of these files may date back to the 1960's and 1970's.
 
 > [!TIP]  
-> I developed this tool over a series of livestreams, which you can check out [here](https://www.youtube.com/@orhundev/streams).
+> I developed this tool over a series of livestreams, which you can check out [here](https://www.youtube.com/watch?v=_tXCDBFAXNg&list=PLxqHy2Zr5TiWif_1QOB-uAVfPUNdGqWQh).
 
 ### Installation
 
