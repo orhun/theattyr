@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.4 - 2024-09-24
+
+### 🚀 Features
+
+- *(release)* Add a simpler release workflow
+- *(args)* Support starting with a file name
+- *(args)* Add command-line arguments
+
+### 🐛 Bug Fixes
+
+- *(lint)* Remove unnecessary format
+- *(app)* Return error on unknown file
+
+### 🚜 Refactor
+
+- *(ci)* Split jobs
+
+### 📚 Documentation
+
+- *(readme)* Add more context
+- *(readme)* Update project details
+
+### 🎨 Styling
+
+- *(fmt)* Fix formatting
+- *(app)* Update title
+- *(ui)* Update the style
+- *(ui)* Tweak the UI
+
 ## 0.1.3 - 2024-09-12
 
 ### ⚙️ Miscellaneous Tasks
