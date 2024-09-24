@@ -1,7 +1,7 @@
 [package]
 name = "theattyr"
 version = "0.1.3"
-description = "A terminal theatre for playing VT100 art and animations"
+description = "A terminal theater for playing VT100 art and animations"
 authors = ["Orhun Parmaksız <orhunparmaksiz@gmail.com>"]
 license = "MIT OR Apache-2.0"
 readme = "README.md"
