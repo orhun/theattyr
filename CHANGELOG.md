@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.8 - 2024-09-26
+
+### 🎨 Styling
+
+- *(tui)* Fade the list on scroll
+
 ## 0.1.7 - 2024-09-24
 
 ### 🐛 Bug Fixes
