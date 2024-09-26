@@ -14,7 +14,7 @@ use color_eyre::Result;
 use ratatui::{
     layout::{Alignment, Constraint, Direction, Layout, Margin, Rect},
     style::{Color, Style, Stylize},
-    text::Line,
+    text::{Line, ToLine},
     widgets::{
         block::{Position, Title},
         Block, List, ListState, Scrollbar, ScrollbarOrientation, ScrollbarState,
@@ -120,31 +120,36 @@ impl App {
             ],
         )
         .split(frame.area());
+
+        let mut lines = Vec::new();
+        let selected = self.list_state.selected().unwrap_or_default();
+        for (i, animation) in self.animations.iter().enumerate() {
+            let distance = (i as isize - selected as isize).abs() as f64;
+            let adjusted_brightness = (100. - distance * 2.).max(30.);
+            let color = Color::from_hsl(0.0, 0.0, adjusted_brightness);
+            let line = animation.to_line().style(Style::default().fg(color));
+            lines.push(line);
+        }
+
         frame.render_stateful_widget(
-            List::new(
-                self.animations
-                    .clone()
-                    .into_iter()
-                    .map(Line::from)
-                    .collect::<Vec<Line>>(),
-            )
-            .block(
-                Block::bordered()
-                    .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
-                    .title(
-                        "VT100 Animations"
-                            .fg(Color::Reset)
-                            .bold()
-                            .underlined()
-                            .into_centered_line(),
-                    ),
-            )
-            .highlight_style(if self.animation.is_rendered {
-                Style::default().fg(Color::Magenta).slow_blink()
-            } else {
-                Style::default().fg(Color::Green)
-            })
-            .highlight_symbol("➤ "),
+            List::new(lines)
+                .block(
+                    Block::bordered()
+                        .border_style(Style::default().fg(Color::Rgb(100, 100, 100)))
+                        .title(
+                            "VT100 Animations"
+                                .fg(Color::Reset)
+                                .bold()
+                                .underlined()
+                                .into_centered_line(),
+                        ),
+                )
+                .highlight_style(if self.animation.is_rendered {
+                    Style::default().fg(Color::Magenta).slow_blink()
+                } else {
+                    Style::default().fg(Color::Green)
+                })
+                .highlight_symbol("➤ "),
             area[0],
             &mut self.list_state,
         );
