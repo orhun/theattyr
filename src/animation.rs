@@ -41,13 +41,14 @@ impl Widget for &mut Animation {
         Self: Sized,
     {
         let mut line_buffer = String::new();
-        let bytes_read = self.reader.read_line(&mut line_buffer).unwrap();
-        self.buffer += &line_buffer;
-        self.parser.process(self.buffer.as_bytes());
-        let pseudo_term = PseudoTerminal::new(self.parser.screen());
-        pseudo_term.render(area, buf);
-        if bytes_read == 0 {
-            self.is_rendered = true;
+        if let Ok(bytes_read) = self.reader.read_line(&mut line_buffer) {
+            self.buffer += &line_buffer;
+            self.parser.process(self.buffer.as_bytes());
+            let pseudo_term = PseudoTerminal::new(self.parser.screen());
+            pseudo_term.render(area, buf);
+            if bytes_read == 0 {
+                self.is_rendered = true;
+            }
         }
     }
 }

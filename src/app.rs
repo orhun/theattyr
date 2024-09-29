@@ -228,7 +228,7 @@ impl App {
     pub fn start_animation(&mut self) {
         let selected = self.list_state.selected().unwrap_or_default();
         let data = Animations::get(&self.animations[selected].clone())
-            .unwrap()
+            .expect("no animation found")
             .data
             .into_owned();
         self.animation = Animation {
