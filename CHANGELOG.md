@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## 0.1.9 - 2024-09-29
+
+### 🐛 Bug Fixes
+
+- *(render)* Handle errors gracefully
+
 ## 0.1.8 - 2024-09-26
 
 ### 🎨 Styling
