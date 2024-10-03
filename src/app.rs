@@ -2,6 +2,10 @@ use std::{
     io::{BufReader, Cursor},
     time::{Duration, Instant},
 };
+use tachyonfx::{
+    fx::{self},
+    Duration as FxDuration, Effect, EffectRenderer, Interpolation, Shader,
+};
 use vt100::Parser;
 
 use crate::{
@@ -43,11 +47,14 @@ pub struct App {
     pub frame_interval: Duration,
     /// FPS counter widget.
     pub fps: Fps,
+    /// Terminal effect.
+    pub effect: Effect,
 }
 
 impl App {
     /// Construct a new instance of [`App`].
     pub fn new(event_handler: EventHandler, args: Args) -> Self {
+        let effect = fx::coalesce((800, Interpolation::SineOut));
         Self {
             is_running: true,
             is_toggled: true,
@@ -58,6 +65,7 @@ impl App {
             animation_area: Rect::default(),
             frame_interval: Duration::from_secs_f32(1.0 / args.fps),
             fps: Fps::default(),
+            effect,
             args,
         }
     }
@@ -203,6 +211,11 @@ impl App {
                 .position(Position::Bottom),
             );
 
+        self.animation_area = area[1].inner(Margin {
+            vertical: 1,
+            horizontal: 1,
+        });
+
         if !self.animation.is_rendered {
             block = block.title(
                 Title::from(Line::from(vec![
@@ -218,11 +231,12 @@ impl App {
         }
 
         frame.render_widget(block, area[1]);
-        self.animation_area = area[1].inner(Margin {
-            vertical: 1,
-            horizontal: 1,
-        });
         frame.render_widget(&mut self.animation, self.animation_area);
+        frame.render_effect(
+            &mut self.effect,
+            self.animation_area,
+            FxDuration::from_millis(100),
+        );
     }
 
     pub fn start_animation(&mut self) {
@@ -237,5 +251,6 @@ impl App {
             parser: Parser::new(self.animation_area.height, self.animation_area.width, 0),
             buffer: String::new(),
         };
+        self.effect.reset();
     }
 }

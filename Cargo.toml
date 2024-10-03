@@ -26,6 +26,7 @@ vt100 = "0.15.2"
 rust-embed = { version = "8.5.0", features = ["compression", "debug-embed"] }
 color-eyre = "0.6.3"
 clap = { version = "4.5.17", features = ["derive", "env", "wrap_help", "cargo"] }
+tachyonfx = "0.7.0"
 
 [profile.dev]
 opt-level = 0
