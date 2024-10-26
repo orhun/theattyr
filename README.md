@@ -24,6 +24,10 @@ cargo install theattyr
 
 Simply run `theattyr` and browse the terminal movies!
 
+![demo](demo/theattyr-demo-shaders.gif)
+
+The demo above uses [RetroArch shaders](https://raphamorim.io/rio/docs/features/retroarch-shaders/) for additional nostalgia!
+
 ![demo1](demo/theattyr-demo1.gif)
 
 ![demo2](demo/theattyr-demo2.gif)
